@@ -22,13 +22,18 @@ def get_updated_repos():
     Get the list of updated repositories from updated_repos.csv file
     """
     updated_repos = set()
-    try:
+    try:        
         with open('updated_repos.csv', mode='r') as file:
             csvFile = csv.reader(file)
             # Add all URLs of updated repositories to the set
             updated_repos.update(line[0] for line in csvFile)
+        
     except FileNotFoundError:
-        pass
+        with open('updated_repos.csv', mode='w') as file:
+            fieldname = ['updated_urls']
+            writer = csv.DictWriter(file, fieldnames=fieldname)
+            writer.writeheader()
+
     return updated_repos
 
 def search_directory(path, repository, writer, repository_name, repository_org, repository_url):
@@ -36,23 +41,29 @@ def search_directory(path, repository, writer, repository_name, repository_org, 
     Search the given directory for ".tf" files and update the contents
     """
     contents = repository.get_contents(path)
-    changes_made = False
+    changes_made = []
     for content in contents:
         if content.type == "file":
             if content.path.endswith(".tf"):
-                file_data = repository.get_contents(content.path).decoded_content.decode()
-                if "github.com/[GHEC_Y]" in file_data:
-                    # update the content 
-                    new_file_data = file_data.replace("github.com/[GHEC_Y]", "github.com/[GHEC_Y_updated]")
+                file_data = repository.get_contents(content.path)
+                if "github.com/[GHEC_Y]" in file_data.decoded_content.decode():
                     # Write the changes to the csv file
-                    writer.writerow({'repo_name': repository_name, 'org': repository_org, 'url': repository_url, 'file_path': content.path, 'old_url': "github.com/[GHEC_Y]", 'new_url': "github.com/[GHEC_Y_updated]"})
-                    changes_made = True
+                    writer.writerow({
+                        'repo_name': repository_name,
+                        'org': repository_org, 
+                        'url': repository_url,
+                        'file_path': content.path,
+                        'old_url': "github.com/[GHEC_Y]", 
+                        'new_url': "github.com/[GHEC_X]"})
+                    changes_made.append(content.path)
         elif content.type == "dir":
-            changes_made = search_directory(content.path, repository, writer, repository_name, repository_org, repository_url) or changes_made
+            changes_made += search_directory(content.path, repository, writer, repository_name, repository_org, repository_url)
     return changes_made
 
 
-def update_repo(repository, updated_repos, writer, error_count):
+
+
+def update_repo(repository, updated_repos, error_count, writer):
     """
     Check if the repository has already been updated and update the repository if needed.
     """
@@ -60,25 +71,40 @@ def update_repo(repository, updated_repos, writer, error_count):
         repository_name = repository.name
         repository_org = repository.owner.login
         repository_url = repository.html_url
-        if repository.html_url in updated_repos:
-            print(f'{repository.html_url} already updated, skipping...')
+        if repository_url in updated_repos:
+            print(f'{repository_url} already updated, skipping...')
             return error_count
 
         changes_made = search_directory("", repository, writer, repository_name, repository_org, repository_url)
         if changes_made:
-            repository.create_git_commit("Update URL of terraform files", "master", [{"path": "*", "mode": "100644", "type": "blob"}])
+            commit_message = "Update URL of terraform files"
+            master_ref = repository.get_git_ref("heads/master")
+            master_sha = master_ref.object.sha
+            for file_path in changes_made:
+                file_data = repository.get_contents(file_path)
+                new_file_data = file_data.decoded_content.decode().replace("github.com/[GHEC_Y]", "github.com/[GHEC_X]")
+                repository.update_file(file_path, commit_message, new_file_data, file_data.sha, branch="master")
+                repository.create_commit(commit_message, master_ref.object.sha, master_sha)
             # Add the repository to the list of updated repositories
-            updated_repos.add(repository.html_url)
+            with open('updated_repos.csv', mode='a') as file:
+                fieldname = ['updated_urls']
+                writer = csv.DictWriter(file, fieldnames=fieldname)
+                writer.writerow({'updated_urls':repository_url})
             if error_count >= 100:
                 print("Github API error limit reached, exiting the script")
                 return error_count
         return error_count
 
     except Exception as e:
+        print(f"Error Occured: {e}")
         error_count += 1
-        with open('errors.log', mode='a') as errors_log:
-            errors_log.write(f"{repository_name} : {e} \n")
+        if error_count >= 100:
+            print("Github API error limit reached, exiting the script")
+            return error_count
+        # Wait for some time before making next API call
+        time.sleep(5)
         return error_count
+
     
 def update_repositories(repositories, updated_repos):
     """
@@ -121,8 +147,3 @@ if __name__ == "__main__":
     updated_repos = get_updated_repos()
     update_repositories(repositories, updated_repos)
     rate_limit = g.get_rate_limit()
-    
-    if rate_limit.remaining <= rate_limit.threshold:
-        print("Rate limit threshold reached, waiting for reset.")
-        reset_time = rate_limit.reset - datetime.utcnow()
-        time.sleep(reset_time.seconds + reset_time.microseconds / 1e6)
