@@ -135,8 +135,10 @@ def iterate_over_repositories(repositories, updated_repos, writer, error_count):
 
         # Check if the rate limit has been reached (in order to verify)
         rate_limit = g.get_rate_limit()
+        print(f"Ramaining rate limit: {rate_limit.remaining}")
         if rate_limit.remaining <= rate_limit.threshold:
-            print("Rate limit threshold reached, waiting for reset.")
+            print(f"Rate limit threshold reached {rate_limit.treshold}, waiting for reset.")
+            
             reset_time = rate_limit.reset - datetime.utcnow()
             time.sleep(reset_time.seconds + reset_time.microseconds / 1e6)
 
@@ -146,4 +148,4 @@ if __name__ == "__main__":
     organization, repositories = get_organization_and_repos(g)
     updated_repos = get_updated_repos()
     update_repositories(repositories, updated_repos)
-    rate_limit = g.get_rate_limit()
+
