@@ -19,7 +19,7 @@ It will also commit the changes made to the repository and keeps a record of the
 5. Run the script and wait for it to complete.
 6. Check the updated_repos.csv file for the list of updated repositories.
 
-## Note
+## Notes
 - This script assumes that the updated_repos.csv file already exists, if this is not the case it will create the file with the required fields.
 - Be cautious when running the script with actual values and on the actual repository, this script will make changes on the repository it is run on.
 - Error handling has not been added on some parts of the script, it would be good to add it before running in production.
