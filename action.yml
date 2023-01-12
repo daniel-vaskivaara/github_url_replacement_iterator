@@ -1,0 +1,23 @@
+name: 'search-replace repo util'
+description: 'search repo for files with a given extension and perform a text search & replace'
+inputs:
+  file_format:
+    description: 'file search pattern (plaintext or regex)'
+    required: false
+    default: '*'
+  search_string:
+    description: 'string to search for'
+    required: true
+  replace_string:
+    description: 'replacment string'
+    required: true
+outputs:
+  change_log:
+    description: 'log of replacements'
+runs:
+  using: 'docker'
+  image: 'Dockerfile'
+  args:
+    - ${{ inputs.file_format }}
+    - ${{ inputs.search_string }}
+    - ${{ inputs.replace_string }}
