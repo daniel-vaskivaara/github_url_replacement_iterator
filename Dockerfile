@@ -1,5 +1,6 @@
 FROM python:3.9-alpine
 
-COPY src/* /opt
+COPY src/github_action_test.py /opt
 
-ENTRYPOINT ["python3", "/opt/github_action_test.py"]
+ENTRYPOINT ["python3"]
+CMD ["/opt/github_action_test.py"]

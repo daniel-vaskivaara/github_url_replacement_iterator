@@ -1,10 +1,10 @@
-name: 'search-replace repo util'
+name: 'repo-search-replace'
 description: 'search repo for files with a given extension and perform a text search & replace'
 inputs:
-  file_format:
-    description: 'file search pattern (plaintext or regex)'
+  file_pattern:
+    description: 'file search pattern ('plaintext' or '/regex/')'
     required: false
-    default: '*'
+    default: '/.*/'
   search_string:
     description: 'string to search for'
     required: true
