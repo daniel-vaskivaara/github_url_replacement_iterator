@@ -8,14 +8,12 @@ jobs:
     runs-on: ubuntu-latest
     name: test run for repo file search & replace Action
     steps:
-      - name: Checkout
-        uses: actions/checkout@v3
+      # - name: Checkout
+      #   uses: actions/checkout@v3
       - name: Search & Replace
-        uses: ./ # Action file scope
-        id: search_replace
+        uses: actions/repo-search-replace@v2'
+        description: 'search repo files matching the file_pattern input, and then perform a search & replace'
         with:
-          who-to-greet: 'Mona the Octocat'
-      # Use the output from the `hello` step
-      - name: Get the output time
-        run: echo "The time was ${{ steps.hello.outputs.time }}"
-7        
+          file_pattern: '*.python'
+          search_string: 'find_me'
+          replace_string: 'replaced!'

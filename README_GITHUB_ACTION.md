@@ -24,7 +24,7 @@ log of replacements
 
 ## Example usage
 
-uses: actions/github_url_replacement_iterator@v2'
+uses: actions/repo-search-replace@v2'
 description: 'search repo files matching the file_pattern input, and then perform a search & replace
 with:
   file_pattern: `/.*\.tf/`
