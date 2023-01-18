@@ -8,7 +8,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v3
       - name: Search & Replace
-        uses: actions/repo-search-replace@v2'
+        uses: ./
         description: 'search repo files matching the file_pattern input, and then perform a search & replace'
         with:
           file_pattern: '*.python'
