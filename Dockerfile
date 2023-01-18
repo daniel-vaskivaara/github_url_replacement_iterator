@@ -1,5 +1,6 @@
 FROM python:3.9-alpine
 
-COPY src/github_action_test.py /github/workspace/
+COPY entrypoint.sh /entrypoint.sh
 
-CMD ["python3 /github/workspace/github_action_test.py"]
+ENTRYPOINT ["/entrypoint.sh"]
+# CMD ["python3 /github_action_test.py"]
