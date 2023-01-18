@@ -2,7 +2,7 @@ name: 'repo-search-replace'
 description: 'search repo for files with a given extension and perform a text search & replace'
 inputs:
   file_pattern:
-    description: 'file search pattern ('plaintext' or '/regex/')'
+    description: 'file search pattern (plaintext or /regex/)'
     required: false
     default: '/.*/'
   search_string:
