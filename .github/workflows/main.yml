@@ -11,6 +11,6 @@ jobs:
         uses: ./
         id: repo-search-replace
         with:
-          file_pattern: '*.python'
+          file_pattern: 'python'
           search_string: 'find_me'
           replace_string: 'replaced!'

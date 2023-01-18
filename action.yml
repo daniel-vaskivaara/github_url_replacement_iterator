@@ -18,6 +18,6 @@ runs:
   using: 'docker'
   image: 'Dockerfile'
   args:
-    - ${{ inputs.file_format }}
+    - ${{ inputs.file_pattern }}
     - ${{ inputs.search_string }}
     - ${{ inputs.replace_string }}
