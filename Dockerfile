@@ -1,6 +1,7 @@
 FROM python:3.9-alpine
 
-COPY entrypoint.sh /entrypoint.sh
+# COPY entrypoint.sh /entrypoint.sh
+# ENTRYPOINT ["/entrypoint.sh"]
 
-ENTRYPOINT ["/entrypoint.sh"]
-# CMD ["python3 /github_action_test.py"]
+COPY src/github_action_test.py /github_action_test.py
+ENTRYPOINT ["python3 /github_action_test.py"]
