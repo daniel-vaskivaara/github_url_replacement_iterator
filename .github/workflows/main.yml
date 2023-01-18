@@ -10,6 +10,7 @@ jobs:
       - name: Search & Replace
         uses: ./
         description: 'search repo files matching the file_pattern input, and then perform a search & replace'
+        id: repo-search-replace
         with:
           file_pattern: '*.python'
           search_string: 'find_me'
